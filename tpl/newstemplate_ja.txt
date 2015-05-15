@@ -1,0 +1,10 @@
+//field  |type    |length              |value  |description       | add info   (<-do not delete this line)
+anchor   |label   |size="14"           |       |Anchor ID         |anchordescr
+head     |text    |size="64"           |       |見出し            |headdescr
+subtitle |text    |size="64"           |       |サブタイトル      |subtitledescr
+link     |link    |size="64"           |       |Linked page       |linkdescr
+start    |date    |size="10"           |now    |公開開始日        |startdescr
+stop     |date    |size="10"           |4 month|公開終了日        |stopdescr
+author   |label   |size="14"           |       |発行者            |authordescr
+tags     |text    |size="14"           |       |Tag&nbsp          |tagdescr
+text     |textarea|cols="63" rows="7"  |       |記事:             |msgdescr
