@@ -17,5 +17,5 @@ $lang['yh_level']       = 'Überschriftsebene für die Gruppierung aller News-Ar
 $lang['mh_level']       = 'Überschriftsebene für die Gruppierung aller News-Artikel pro Monat';
 $lang['h_level']        = 'Überschriftsebene für die News-Artikel selber';
 $lang['lnk_newsarchive']= 'Text für den Archiv-Link';
-$meta['act_delim']      = 'einige Templates / DW-Versionen benötigen ein "?" statt des "&" für Action-Links';
+$lang['act_delim']      = 'einige Templates / DW-Versionen benötigen ein "?" statt des "&" für Action-Links';
 $lang['convert']        = 'Link zu einem "thumbshots online service"';                                                                                                       

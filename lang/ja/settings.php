@@ -18,5 +18,5 @@ $lang['yh_level']       = '全記事表示での年タイトルの見出しレ�
 $lang['mh_level']       = '全記事表示での月タイトルの見出しレベル';
 $lang['h_level']        = '全記事表示での個別ニュース記事の見出しレベル';
 $lang['lnk_newsarchive']= 'アーカイブリンクのタイトル';
-$meta['act_delim']      = 'some templates / dw-version use questionmark instead of ampersand at action links';
+$lang['act_delim']      = 'some templates / dw-version use questionmark instead of ampersand at action links';
 $lang['convert']        = 'Link a thumbshots online service';
