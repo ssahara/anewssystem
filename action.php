@@ -41,10 +41,8 @@ class action_plugin_anewssystem extends DokuWiki_Action_Plugin {
         $prefix       = 'anss';
         $del          = 'anss_del';
         $cut_prefx    = 'news_input_';
-        $allnewsdata1 = $this->getConf('news_output');
-        $allnewsdata  = wl( (isset($allnewsdata1) ? $allnewsdata1 : 'news:newsdata') );
-        $i            = strripos($allnewsdata, ":");
-        $news_root    = substr($allnewsdata, 0, $i);
+        $news_output  = $this->getConf('news_output');
+        $allnewsdata  = wl( (empty($news_output) ? 'news:allnewsdata' : $news_output) );
 
         // necessary for the back link of a show one article per page (SOAPP)
         if (stripos($_GET['archive'],'archive')!== false) $ans_conf['param'] = $_GET['archive'];
@@ -78,7 +76,7 @@ class action_plugin_anewssystem extends DokuWiki_Action_Plugin {
 
         // split parameter into array with key and data
         foreach ($split_array as $item) {
-            list($key, $value) = split("=",trim($item),2);
+            list($key, $value) = explode("=",trim($item),2);
             $archive_options = $archive_options + array($key => $value);
         }
 
@@ -111,7 +109,7 @@ class action_plugin_anewssystem extends DokuWiki_Action_Plugin {
             $aFlag = false;   // flag: start date value exists and start is not in future
 
             foreach ($article_array as $item) {
-                list($key, $value) = split(":",trim($item),2);
+                list($key, $value) = explode(":",trim($item),2);
                 $tag_flag = false;
                 if ($key=='anchor') {
                     $anchor = trim($value);

@@ -76,7 +76,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         $del          = 'anss_del';
         $cut_prefx    = 'news_input_';
         $news_output  = $this->getConf('news_output');
-        $allnewsdata  = wl( (empty($news_output) ? 'news:newsdata' : $news_output) );
+        $allnewsdata  = wl( (empty($news_output) ? 'news:allnewsdata' : $news_output) );
 
         // check if user has write permission on that ID
         $current_usr = pageinfo();
