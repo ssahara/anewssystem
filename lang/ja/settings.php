@@ -10,9 +10,9 @@
 // for the configuration manager
 $lang['d_format']       = '日付表示形式 (例. Y-m-d)';
 $lang['news_datafile']  = '記事データ格納ページ (namespace:newsdata)';
-$lang['news_output']    = '記事一覧表示ページ ({{anss>allnews}} を設置するページ)';
+$lang['news_output']    = '記事一覧ページ ({{anss>allnews}} を設置するページ)';
 $lang['prev_length']    = 'プレビューに表示する文字列の上限値 ({{anss>flash}})';
-$lang['newsflash_link'] = 'プレビューボックスのタイトルを記事作成ページへのリンクにする';
+$lang['newsflash_link'] = 'プレビューボックスのタイトルを記事一覧ページへのリンクにする';
 $lang['hide_anchorID']  = 'Anchor ID を表示しない';
 $lang['soapp']          = 'show only one article per page'; // soapp = show one article per page (instead of all news)
 $lang['yh_level']       = '全記事表示での年タイトルの見出しレベル';
