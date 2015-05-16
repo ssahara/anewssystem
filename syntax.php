@@ -22,36 +22,25 @@ require_once(DOKU_INC.'inc/auth.php');
  */
 class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 
-/******************************************************************************/
-/* return some info
-*/
-    function getInfo(){
-        return confToHash(dirname(__FILE__).'/plugin.info.txt');
-    }
-
     function getType(){ return 'substition';}
     function getPType(){ return 'block';}
     function getSort(){ return 167;}
-    
-/******************************************************************************/
-/* Connect pattern to lexer
-*/
+
     function connectTo($mode){
         $this->Lexer->addSpecialPattern('\{\{anss>[^}]*\}\}',$mode,'plugin_anewssystem');
     }
 
-/******************************************************************************/
-/* handle the match
-*/
+    /**
+     * handle the match
+     *
+     * @author Taggic <taggic@t-online.de>
+     */
     function handle($match, $state, $pos, Doku_Handler $handler) {
         global $ID, $conf;
         $match = substr($match,strlen('{{anss>'),-2); //strip markup from start and end
 
         //handle params
         $data = array();
-    /******************************************************************************/
-    /*      parameter 1 can be one of the following: xs-author, flash 
-    /******************************************************************************/
 
         $params = $match;  // if you will have more parameters and choose ',' to delim them
 
@@ -67,13 +56,17 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         }
         else { return $ans_conf;}
      }
-/******************************************************************************/
-/* render output
-* @author Taggic <taggic@t-online.de>
-*/
+
+
+    /**
+     * render output
+     *
+     * @author Taggic <taggic@t-online.de>
+     */
     function render($mode, Doku_Renderer $renderer, $ans_conf) {
         global $ID, $conf;
         $xhtml_renderer = new Doku_Renderer_xhtml();
+
         $template     = DOKU_PLUGIN.'anewssystem/tpl/newstemplate_'.$conf['lang'].'.txt';
         if (file_exists($template)) {
             $records  = file($template);
@@ -90,17 +83,18 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         $allnewsdata  = wl( (isset($allnewsdata1) ? $allnewsdata1 : 'news:newsdata') );
         $i            = strripos($allnewsdata, ":");
         $news_root    = substr($allnewsdata, 0, $i);
+
         // check if user has write permission on that ID
         $current_usr = pageinfo();
+
         // necessary for the back link of a show one article per page (SOAPP)
         if(stripos($_GET['archive'],'archive')!== false) $ans_conf['param'] = $_GET['archive'];
-        $_GET['archive']="";
+        $_GET['archive'] = '';
 
       /*------- add news action part -----------------------------------------*/
         $post_prefix   = $_POST["xs-".$prefix];
         $delete_record = $_POST["anss_del_record"];
         $delete_anchor = $_POST["anss_del_anchor"];
-//            msg($delete_record." = |".$delete_anchor.'|',0);
 
         if (!isset($delete_anchor)) $delete_anchor = $delete_record; // if anchor field was deleted on input
 
@@ -151,32 +145,33 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             // write file
             saveWikiText($targetpage, $news_records, "New entry", true);
         }
-      /*------- show user form -----------------------------------------------*/
-            // this will provide the user form to add further news
-            // 2. create input form based on template
+
+        /* -------------------------------------------------------
+         *  Render news authoring interface
+         * -------------------------------------------------------
+         *  {{anss>author}}
+         *
+         */
         if ($ans_conf['param']==='author') {
 
-            $output .= '<span><script type="text/javascript">
-                          function count_chars(obj, max) {
-                              var data = obj.value;
-                              var extract = data.split(" ");
-                              var bextract = data.split("\n");
-                              var cextract = extract.length + bextract.length -1;
-                              if(cextract>max) output = \'<span style="color:red;">\' + cextract + \'</span>\';
-                              else output = cextract;
-                              document.getElementById("nws_charcount").innerHTML =  "'.$this->getLang('wordcount').'"
-                          }
-
-                          function resizeBoxId(obj,size) {
+            $output .= '<span><script type="text/javascript">/*<![CDATA[*/'.
+                       'function count_chars(obj, max) {
+                            var data = obj.value;
+                            var extract = data.split(" ");
+                            var bextract = data.split("\n");
+                            var cextract = extract.length + bextract.length -1;
+                            if(cextract>max) output = \'<span style="color:red;">\' + cextract + \'</span>\';
+                            else output = cextract;
+                            document.getElementById("nws_charcount").innerHTML ="'.$this->getLang('wordcount').'"
+                        }
+                        function resizeBoxId(obj,size) {
                               var arows = document.getElementById(obj).rows;
                               document.getElementById(obj).rows = arows + size;
-                          }
-                       </script></span>';
+                        }'.
+                       '/*!]]>*/</script></span>';
 
-            $output .= '<div class="news_form_div">
-                       <form class="news_input_form" id="'.$prefix.'"
-                            method="POST"
-                            >'.NL;
+            $output .= '<div class="news_form_div">'.
+                       '<form class="news_input_form" id="'.$prefix.'" method="POST">'.NL;
 
             $output .= '<input type="hidden" name="xs-'.$prefix.'" value="check" />'.NL;
 
@@ -199,11 +194,11 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                                ' name="news_input_'.trim($fields[0]).'"'.
                                ' title="'.trim($this->getLang(trim($fields[5]))).'" '.trim($fields[2]).'"'.
                                ' onkeyup="count_chars(this,'.$this->getConf('prev_length').')" >'.
-                               '</textarea>
-                                      <span class="reply_close_link">
-                                      <a href="javascript:resizeBoxId(\'news_input_'.trim($fields[0]).'\', -20)"><img src="'.$imgBASE.'reduce.png" title="reduce textarea" style="float:right;" /></a>
-                                      <a href="javascript:resizeBoxId(\'news_input_'.trim($fields[0]).'\', +20)"><img src="'.$imgBASE.'enlarge.png" title="enlarge textarea" style="float:right;" /></a>
-                                      </span></p>'.NL;
+                               '</textarea>'.
+                               '<span class="reply_close_link">'.
+                               '<a href="javascript:resizeBoxId(\'news_input_'.trim($fields[0]).'\', -20)"><img src="'.$imgBASE.'reduce.png" title="reduce textarea" style="float:right;" /></a>'.
+                               '<a href="javascript:resizeBoxId(\'news_input_'.trim($fields[0]).'\', +20)"><img src="'.$imgBASE.'enlarge.png" title="enlarge textarea" style="float:right;" /></a>'.
+                               '</span></p>'.NL;
                 }
                 else if (trim($fields[0]) == "anchor") {
 
@@ -258,8 +253,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                         $default_value = $current_usr['userinfo']['name'];
                     } else $default_value = "";
 
-                    $output .= '<p>'.trim($fields[4]).'
-                                <input class="news_input_'.trim($fields[0]).
+                    $output .= '<p>'.trim($fields[4]).
+                               '<input class="news_input_'.trim($fields[0]).
                                '" id="news_input_'.trim($fields[0]).
                                '" name="news_input_'.trim($fields[0]).
                                '" type="'.trim($fields[1]).
@@ -268,8 +263,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                                '" /></p>'.NL;
                 } else if (trim($fields[1]) == "link") {
                     $default_value = wl($allnewsdata1).$link_anker;
-                    $output .= '<p>'.trim($fields[4]).'
-                                <input class="news_input_'.trim($fields[0]).
+                    $output .= '<p>'.trim($fields[4]).
+                               '<input class="news_input_'.trim($fields[0]).
                                '" id="news_input_'.trim($fields[0]).
                                '" name="news_input_'.trim($fields[0]).
                                '" type="'.trim($fields[1]).
@@ -277,8 +272,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                                'value="'.$default_value.'" title="'.trim($this->getLang(trim($fields[5]))).
                                '" /></p>'.NL;
                 } else {
-                    $output .= '<p>'.trim($fields[4]).'
-                                <input class="news_input_'.trim($fields[0]).
+                    $output .= '<p>'.trim($fields[4]).
+                               '<input class="news_input_'.trim($fields[0]).
                                '" id="news_input_'.trim($fields[0]).
                                '" name="news_input_'.trim($fields[0]).
                                '" type="'.trim($fields[1]).
@@ -300,7 +295,13 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= $output;
         }
 
-      /*------- show perview -------------------------------------------------*/
+
+        /* -------------------------------------------------------
+         *  Render news preview interface
+         * -------------------------------------------------------
+         *  {{anss>flash}}
+         *
+         */
         elseif (strpos($ans_conf['param'], 'flash')!== false) {
             $info      = array();
             $tmp       = substr($ans_conf['param'],strlen('flash')); //strip parameter to get set of add parameter
@@ -488,7 +489,14 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $output         = '<script type="text/javascript" src="'.DOKU_URL.'lib/plugins/anewssystem/dropdowncontent.js"></script>'.$output;
             $renderer->doc .= $output;
         }
-        /* --- Display a cloud of News Tags --------------------------------*/
+
+
+        /* -------------------------------------------------------
+         *  Render news cloud of news tags
+         * -------------------------------------------------------
+         *  {{anss>cloud}}
+         *
+         */
         elseif (strpos($ans_conf['param'], 'cloud')!== false) {
             $tmp       = substr($ans_conf['param'],strlen('cloud')); //strip parameter to get set of add parameter
             $oldrecord = rawWiki($targetpage);
@@ -602,7 +610,13 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $output .= '</div>'.NL;
             $renderer->doc .= $output;
         }
-        /* --- Show all news -------------------------------------------------*/
+
+        /* -------------------------------------------------------
+         *  Render news reader panel of latest news articles
+         * -------------------------------------------------------
+         *  {{anss>allnews}}
+         *
+         */
         elseif ((strpos($ans_conf['param'], 'allnews')!== false)) {
             // check if page ID was called with tag filter
             $tmp = ','.$_GET['tag'];    // this will overrule the page syntax setting
@@ -773,21 +787,21 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                         $backlink .= '<span class="anss_sep"> &nbsp;|&nbsp;</span>
                           <a href="'.DOKU_URL.'doku.php?id='.$this->getConf('news_output').'">'.
                           $this->getLang('allnews').'</a>';
-                        $output = '<script type="text/javascript" src="backlink.js"></script>
-                                   <script type="text/javascript">
-                                   <!--
+                        $output = '<script type="text/javascript" src="backlink.js"></script>'.
+                                  '<script type="text/javascript">/*<![CDATA[*/'.
+                                  '<!--
                                     var gb = new backlink();
                                     gb.write();
-                                    //-->
-                                  </SCRIPT>
-                                 <div style="font-size:.85em;">'.$backlink.NL.
-                                '<span class="anss_sep">&nbsp;|&nbsp;</span><a class"wikilink" href="'.wl($ID).$this->getConf('act_delim').'archive=archive">'.$archive_lnkTitle.'</a></div><br />'.NL.
-                                '<div class="archive_section" id="news_archive_head"  style="'.$archive_options['style'].'">'.
-                                  $output.
-                                '<div style="font-size:.85em;">'.$backlink.NL.
-                                '<span class="anss_sep">&nbsp;|&nbsp;</span>
-                                 <a class"wikilink" href="'.wl($ID).$this->getConf('act_delim').
-                                'archive=archive">'.$archive_lnkTitle.'</a></div><br />'.NL;
+                                    //-->'.
+                                  '/*!]]>*/</script>'.
+                                  '<div style="font-size:.85em;">'.$backlink.NL.
+                                  '<span class="anss_sep">&nbsp;|&nbsp;</span><a class"wikilink" href="'.wl($ID).$this->getConf('act_delim').'archive=archive">'.$archive_lnkTitle.'</a></div><br />'.NL.
+                                  '<div class="archive_section" id="news_archive_head"  style="'.
+                                  $archive_options['style'].'">'.$output.
+                                  '<div style="font-size:.85em;">'.$backlink.NL.
+                                  '<span class="anss_sep">&nbsp;|&nbsp;</span>'.
+                                  '<a class"wikilink" href="'.wl($ID).$this->getConf('act_delim').
+                                  'archive=archive">'.$archive_lnkTitle.'</a></div><br />'.NL;
                         break;  // due to the single linked article is loaded into $output
                     }
                 }
@@ -802,7 +816,14 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $output .= '</div><div style="clear: both;"></div>'.NL.NL;
             $renderer->doc .= $output;
         }
-/* --- Show archive ----------------------------------------------------------*/
+
+
+        /* -------------------------------------------------------
+         *  Render news archive
+         * -------------------------------------------------------
+         *  {{anss>archive}}
+         *
+         */
         elseif ((strpos($ans_conf['param'], 'archive')!== false)) {
             // date  ... consider all news of a defined month of a year (mm.yyyy, empty per default)
             // qty   ... limits the number of news headlines starting with most recent (either integer or all, default:all)
@@ -935,7 +956,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $img_ID   = "img_archive__toc";
 
             if ($archive_options['class']=='toc') {
-                $output = '<script type="text/javascript">
+                $output = '<script type="text/javascript">/*<![CDATA[*/
                            function archive__toc_open(toggle_id, img_ID) 
                               {   if (document.getElementById(toggle_id).style.display == "none")
                                   {   document.getElementById(toggle_id).style.display = "block";
@@ -946,13 +967,13 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                                       document.getElementById(img_ID).style.backgroundPosition = "0px -5px";
                                   }
                               }
-                         </script>
-                         <div class="archive_box" id="archive__toc"  style="'.$archive_options['style'].'">
-                            <h3 class="toggle open" style="cursor: pointer;" onClick="archive__toc_open(\''.$blink_id.'\',\''.$img_ID.'\')">
+                           /*!]]>*/</script>'.
+                          '<div class="archive_box" id="archive__toc"  style="'.$archive_options['style'].'">
+                           <h3 class="toggle open" style="cursor: pointer;" onClick="archive__toc_open(\''.$blink_id.'\',\''.$img_ID.'\')">
                               <strong id="img_archive__toc"></strong>
                               NEWS
-                            </h3>
-                             <div id="news_items">
+                           </h3>
+                           <div id="news_items">
                                  <div style="text-align:left;">
                                  <ul class="n_box">'.$output.'</ul>
                                  </div
@@ -1013,7 +1034,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 /* return html-code for news edit toolbar                                     */
     function news_edit_toolbar($type) {
         $imgBASE = DOKU_BASE."lib/plugins/anewssystem/images/toolbar/";
-        $news_edit_tb .= '<script type="text/javascript">
+        $news_edit_tb .= '<script type="text/javascript">/*<![CDATA[*/
           function doHLine(tag1,obj)
           { textarea = document.getElementById(obj);
             if (document.selection) 
@@ -1115,7 +1136,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                 textarea.scrollLeft = scrollLeft;
               }
           }
-         </script>';
+         /*!]]>*/</script>';
         $news_edit_tb .= '<div class="news_edittoolbar">'.NL;
         $news_edit_tb .= "<img class=\"newsedit_button\" src=\"".$imgBASE."bold.png\"      name=\"btnBold\"          title=\"Bold [b]\"             accesskey=\"b\" onClick=\"doAddTags('**','**','$type')\">".NL;
         $news_edit_tb .= "<img class=\"newsedit_button\" src=\"".$imgBASE."italic.png\"    name=\"btnItalic\"        title=\"Italic [i]\"           accesskey=\"i\" onClick=\"doAddTags('//','//','$type')\">".NL;
