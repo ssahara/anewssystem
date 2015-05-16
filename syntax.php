@@ -65,7 +65,6 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, Doku_Renderer $renderer, $ans_conf) {
         global $ID, $conf;
-        $xhtml_renderer = new Doku_Renderer_xhtml();
 
         $template     = DOKU_PLUGIN.'anewssystem/tpl/newstemplate_'.$conf['lang'].'.txt';
         if (file_exists($template)) {
@@ -1173,3 +1172,4 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         return $news_edit_tb;
     }
 }
+
