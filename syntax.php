@@ -203,8 +203,13 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                 else if (trim($fields[0]) == "anchor") {
 
                     $default_anker = date("YmdHis");
-                    if ($this->getConf('soapp')>0) $link_anker = $this->getConf('act_delim').'anchor='.$default_anker; // to show only one article only on a page
-                    else $link_anker = '#'.$default_anker;  // to show all news at one page but scroll to the anchor position
+                    if ($this->getConf('soapp')>0) {
+                        // to show only one article only on a page
+                        $link_anker = $this->getConf('act_delim').'anchor='.$default_anker;
+                    } else {
+                        // to show all news at one page but scroll to the anchor position
+                        $link_anker = '#'.$default_anker;
+                    }
                     $default_anker = '#'.$default_anker;
 
                     if ((stripos($fields[1],'hidden') === false) && ($this->getConf('hide_anchorID')< 1)) {
@@ -334,7 +339,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             if ($this->getConf('newsflash_link') == false) {
                 $output .= '<div  class="news_header">'.$this->getLang('newsflash_title').'</div>'.NL;
             } else {
-                $output .= '<div  class="news_header"><a class="news_header_link" href="'. $allnewsdata .'">'.$this->getLang('newsflash_title').'</a></div>'.NL;
+                $output .= '<div  class="news_header"><a class="news_header_link" href="'.
+                           $allnewsdata .'">'.$this->getLang('newsflash_title').'</a></div>'.NL;
             }
             $output .= '<div class="news_list" '.$item_width.'">'.NL;
 
@@ -484,9 +490,10 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             if ($item_counter==0) {
               $output .= '<div class="prev_newsitem">'.$this->getLang('noNews').'</div>'.NL;
             }
-            // SAHARA ????????????
-            $output        .= '</div></div>'.NL.NL;
-            $output         = '<script type="text/javascript" src="'.DOKU_URL.'lib/plugins/anewssystem/dropdowncontent.js"></script>'.$output;
+            $output .= '</div></div>'.NL.NL;
+            $output  = '<script type="text/javascript" src="'.
+                       DOKU_URL.'lib/plugins/anewssystem/dropdowncontent.js"></script>'.
+                       $output;
             $renderer->doc .= $output;
         }
 
@@ -994,9 +1001,16 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= $output;
         }
 
-// --- faulty syntax ----------------------------------------------------------
+
+        /* -------------------------------------------------------
+         *  faulty syntax
+         * -------------------------------------------------------
+         *  {{anss>????}}
+         *
+         */
         else {
-            $renderer->doc .= msg('Syntax of anewssystem plugin detected but unknown parameter  ['.$ans_conf['param'].'] was provided.', -1);
+            msg('Syntax of anewssystem plugin detected but unknown parameter  ['.
+                $ans_conf['param'].'] was provided.', -1);
         }
     }
 //---------------------------------------------------------------------------------------
@@ -1159,4 +1173,3 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         return $news_edit_tb;
     }
 }
-?>
