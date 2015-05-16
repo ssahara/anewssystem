@@ -817,7 +817,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 
             // split parameter into array with key and data
             foreach ($split_array as $item) {
-                list($key, $value) = split("=",trim($item),2);
+                list($key, $value) = explode("=",trim($item),2);
                 $archive_options = $archive_options + array($key => $value);
             }
 //          echo $archive_options['tag'].'<br />';
