@@ -9,9 +9,9 @@
  
 // for the configuration manager
 $lang['d_format']       = '日付表示形式 (例. Y-m-d)';
-$lang['news_datafile']  = 'Set the path to the namespace:newsdata file';
-$lang['prev_length']    = 'Define the quantity of previewed words per news post in NewsFlash';
-$lang['newsflash_link'] = 'provide News flash link';
+$lang['news_datafile']  = '記事データ格納ページ (namespace:newsdata)';
+$lang['prev_length']    = 'プレビューに表示する文字列の上限値({{anss>flash}})';
+$lang['newsflash_link'] = 'プレビューボックスのタイトルを記事作成ページへのリンクにする';
 $lang['hide_anchorID']  = 'Anchor ID を表示しない';
 $lang['soapp']          = 'show only one article per page'; // soapp = show one article per page (instead of all news)
 $lang['yh_level']       = '全記事表示での年タイトルの見出しレベル';
