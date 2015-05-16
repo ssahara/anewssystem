@@ -349,7 +349,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                  $aFlag = false;
                  $bFlag = false;
                  foreach ($temp_array as $item) {
-                     list($key, $value) = split(":",trim($item),2);
+                     list($key, $value) = explode(":",trim($item),2);
                      $tag_flag = false;
 
                      if ($key=='anchor') {
@@ -503,7 +503,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 
                 // if perishing date is not exceeded then collect the tags
                 foreach ($temp_array as $item) {
-                    list($key, $value) = split(":",trim($item),2);
+                    list($key, $value) = explode(":",trim($item),2);
                     if (($key=='start') && strtotime(trim($value)) < time()) {
                         $aFlag = true;
                         $value = date($this->getConf('d_format'), strtotime($value));
@@ -648,7 +648,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                 $bFlag = false;
 
                 foreach ($temp_array as $item) {
-                    list($key, $value) = split(":",trim($item),2);
+                    list($key, $value) = explode(":",trim($item),2);
                     $tag_flag = false;
                     if ($key=='anchor') {
                         $anchor = trim($value);
