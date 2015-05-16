@@ -40,12 +40,10 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         $match = substr($match,strlen('{{anss>'),-2); //strip markup from start and end
 
         //handle params
-        $data = array();
-
         $params = $match;  // if you will have more parameters and choose ',' to delim them
 
         //Default Value
-        $ans_conf                 = array();
+        $ans_conf = array();
         $ans_conf['newsroot']     = 'news';
         $ans_conf['newspage']     = 'newsdata';
         $ans_conf['newstemplate'] = DOKU_PLUGIN.'anewssystem/tpl/newstemplate_'.$conf['lang'].'.txt';
@@ -63,8 +61,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
      *
      * @author Taggic <taggic@t-online.de>
      */
-    function render($mode, Doku_Renderer $renderer, $ans_conf) {
-        global $ID, $conf;
+    function render($format, Doku_Renderer $renderer, $ans_conf) {
+        global $ID, $INPUT, $conf;
 
         $template     = DOKU_PLUGIN.'anewssystem/tpl/newstemplate_'.$conf['lang'].'.txt';
         if (file_exists($template)) {
@@ -91,14 +89,19 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         $_GET['archive'] = '';
 
       /*------- add news action part -----------------------------------------*/
-        $post_prefix   = $_POST["xs-".$prefix];
-        $delete_record = $_POST["anss_del_record"];
-        $delete_anchor = $_POST["anss_del_anchor"];
+        $post_prefix   = $INPUT->post->str('xs-'.$prefix);
+        $delete_record = $INPUT->post->str('anss_del_record');
+        $delete_anchor = $INPUT->post->str('anss_del_anchor');
 
         if (!isset($delete_anchor)) $delete_anchor = $delete_record; // if anchor field was deleted on input
 
 
         if ( (strlen($post_prefix)>2) && (auth_quickaclcheck($targetpage) >= AUTH_EDIT) ) {
+
+            /*
+             * 入力フォームから渡されたデータのチェックが必要
+             * フィールド未入力でも 記事が作成されてしまう。
+             */
             // this will be called to store the news article to the others
             $id_count = 1;
             foreach( $_POST as $postkey => $postvalue ) {
@@ -118,7 +121,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                 }
             }
 
-            $newrecord = '====== '.$_POST['news_input_head'].' ======'.chr(10).chr(10).$newrecord.chr(10);
+            $newrecord = '====== '.$INPUT->post->str('news_input_head').' ======'.
+                         chr(10).chr(10).$newrecord.chr(10);
             $oldrecord = rawWiki($targetpage);
 
             saveWikiText($targetpage, $newrecord.$oldrecord, "New entry", true);
@@ -771,9 +775,6 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 
                     $news_date .=  ')</span>'.NL;
 
-                    // prevent output of date and author of ho parameter is given as off
-                    if ((strpos($ans_conf['param'], 'ho=off')!== false)) { $news_date =''; }
-
                     if ((isset($prefs[1]) === false) || (strlen($prefs[1]) <2)) $tag_flag = true;
 
                     if (($aFlag === true) && ($bFlag === true) && ($tag_flag === true)) {
@@ -912,6 +913,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                 }
 
                 $news_date .=  ')</span>'.NL;
+                // prevent output of date and author of ho parameter is given as off
+                if ((strpos($ans_conf['param'], 'ho=off')!== false)) { $news_date =''; }
 
                 if ((isset($archive_options['tag']) === false) || (strlen($archive_options['tag']) <2)) $tag_flag = true;
 
@@ -1172,4 +1175,4 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         return $news_edit_tb;
     }
 }
-
+?>
