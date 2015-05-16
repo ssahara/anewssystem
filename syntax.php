@@ -74,7 +74,12 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
     function render($mode, Doku_Renderer $renderer, $ans_conf) {
         global $ID, $conf;
         $xhtml_renderer = new Doku_Renderer_xhtml();
-        $records      = file(DOKU_PLUGIN.'anewssystem/tpl/newstemplate_'.$conf['lang'].'.txt');
+        $template     = DOKU_PLUGIN.'anewssystem/tpl/newstemplate_'.$conf['lang'].'.txt';
+        if (file_exists($template)) {
+            $records  = file($template);
+        } else {
+            $records  = file(DOKU_PLUGIN.'anewssystem/tpl/newstemplate_en.txt');
+        }
         unset($records[0]);
         $target       = $this->getConf('news_datafile');
         $targetpage   = htmlspecialchars(trim($target));
@@ -91,8 +96,6 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         if(stripos($_GET['archive'],'archive')!== false) $ans_conf['param'] = $_GET['archive'];
         $_GET['archive']="";
 
-        // 1. read template (plugins/anewssystem/template.php)
-        $template   = file_get_contents(DOKU_PLUGIN.'anewssystem/tpl/newstemplate.txt');
       /*------- add news action part -----------------------------------------*/
         $post_prefix   = $_POST["xs-".$prefix];
         $delete_record = $_POST["anss_del_record"];
