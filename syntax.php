@@ -118,7 +118,6 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                         $postvalue = "\n" . $postvalue;
                         $postvalue = str_replace(chr(13),"",$postvalue);
                     }
-//                  if( strpos(trim($postvalue), "\n\n") !== false ) $postvalue = str_replace('\n\n','\n',$postvalue);
                     if (strpos('anchor',$key)>0) {
                         $postvalue ='<a href="'.$postvalue.'">'.$postvalue.'</a>';
                     }
@@ -185,14 +184,17 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                 $fields = explode('|',$record);
                 if (trim($fields[1]) == "textarea") {
                     $output .= '<p>'.trim($fields[4]);
-                    $output .= '<label class="nws_charcount" 
+                    $output .= '<label class="nws_charcount"
                                        id="nws_charcount"
-                                             name="nws_charcount">'.$this->getLang('wordcount2').$this->getConf('prev_length').' )</label><br />';
+                                       name="nws_charcount">'.
+                                $this->getLang('wordcount2').
+                                $this->getConf('prev_length').
+                               ' )</label><br />';
 
                     $output .= $this->news_edit_toolbar('news_input_'.trim($fields[0]));
 
                     $imgBASE = DOKU_BASE."lib/plugins/anewssystem/images/toolbar/";
-                    $output .= '<textarea class="news_input_textarea"'. 
+                    $output .= '<textarea class="news_input_textarea"'.
                                ' id="news_input_'.trim($fields[0]).'"'.
                                ' name="news_input_'.trim($fields[0]).'"'.
                                ' title="'.trim($this->getLang(trim($fields[5]))).'" '.trim($fields[2]).'"'.
@@ -337,7 +339,6 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 
             // 1. read news file (e.g. news:newsdata.txt)
             $oldrecord = rawWiki($targetpage);
-//          $entries = explode("\n----\n\n",$oldrecord);
             $entries = explode("======",$oldrecord);
             foreach ($entries as $entry) {
                 // split news block into line items
@@ -1015,121 +1016,103 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         $news_edit_tb .= '<script type="text/javascript">
           function doHLine(tag1,obj)
           { textarea = document.getElementById(obj);
-          	if (document.selection) 
-          	{     // Code for IE
-          				textarea.focus();
-          				var sel = document.selection.createRange();
-          				sel.text = "\n" + tag1 + "\n" + "\n" + sel.text;
-          	}
+            if (document.selection) 
+            {     // Code for IE
+                textarea.focus();
+                var sel = document.selection.createRange();
+                sel.text = "\n" + tag1 + "\n" + "\n" + sel.text;
+            }
             else 
             {   // Code for Mozilla Firefox
-             		var len = textarea.value.length;
-             	  var start = textarea.selectionStart;
-             		var end = textarea.selectionEnd;
-              		
-             		var scrollTop = textarea.scrollTop;
-             		var scrollLeft = textarea.scrollLeft;
-              		
+                var len = textarea.value.length;
+                var start = textarea.selectionStart;
+                var end = textarea.selectionEnd;
+                var scrollTop = textarea.scrollTop;
+                var scrollLeft = textarea.scrollLeft;
                 var sel = textarea.value.substring(start, end);
-         		    var rep = tag1 + sel;
+                var rep = tag1 + sel;
                 textarea.value =  textarea.value.substring(0,start) + rep + textarea.value.substring(end,len);
-              		
-             		textarea.scrollTop = scrollTop;
-             		textarea.scrollLeft = scrollLeft;
-          	}
+                textarea.scrollTop = scrollTop;
+                textarea.scrollLeft = scrollLeft;
+            }
           }'.
-
          'function doAddTags(tag1,tag2,obj)
           { textarea = document.getElementById(obj);
-          	// Code for IE
-          	if (document.selection) 
-          			{ textarea.focus();
-          				var sel = document.selection.createRange();
-                  if (sel.text == "") sel.text = " ";
-          				sel.text = tag1 + sel.text + tag2;
-          			}
-             else 
-              {  // Code for Mozilla Firefox
-          		  var len = textarea.value.length;
-          	    var start = textarea.selectionStart;
-          		  var end = textarea.selectionEnd;
-          		
-          		  var scrollTop = textarea.scrollTop;
-          		  var scrollLeft = textarea.scrollLeft;
-          		
-                var sel = textarea.value.substring(start, end);
-          		  if (start == end) { sel = " "; }
-                var rep = tag1 + sel + tag2;
-                textarea.value =  textarea.value.substring(0,start) + rep + textarea.value.substring(end,len);
-          		
-          		  textarea.scrollTop = scrollTop;
-          		  textarea.scrollLeft = scrollLeft;
-          	}
-          }'.
-          
-         'function doTT(obj)
-          { textarea = document.getElementById(obj);
-          	// Code for IE
-          	if (document.selection) 
-          			{ textarea.focus();
-          				var sel = document.selection.createRange();
-                  if (sel.text == "") sel.text = " ";
-          				sel.text = "\'\'" + sel.text + "\'\'";
-          			}
-             else 
-              {  // Code for Mozilla Firefox
-          		  var len = textarea.value.length;
-          	    var start = textarea.selectionStart;
-          		  var end = textarea.selectionEnd;
-          		
-          		  var scrollTop = textarea.scrollTop;
-          		  var scrollLeft = textarea.scrollLeft;
-          		
+            // Code for IE
+            if (document.selection) 
+            {
+                textarea.focus();
+                var sel = document.selection.createRange();
+                if (sel.text == "") sel.text = " ";
+                    sel.text = tag1 + sel.text + tag2;
+            }
+            else 
+            {   // Code for Mozilla Firefox
+                var len = textarea.value.length;
+                var start = textarea.selectionStart;
+                var end = textarea.selectionEnd;
+                var scrollTop = textarea.scrollTop;
+                var scrollLeft = textarea.scrollLeft;
                 var sel = textarea.value.substring(start, end);
                 if (start == end) { sel = " "; }
-          		  var rep = "\'\'" + sel + "\'\'";
+                var rep = tag1 + sel + tag2;
                 textarea.value =  textarea.value.substring(0,start) + rep + textarea.value.substring(end,len);
-          		
-          		  textarea.scrollTop = scrollTop;
-          		  textarea.scrollLeft = scrollLeft;
-          	}
+                textarea.scrollTop = scrollTop;
+                textarea.scrollLeft = scrollLeft;
+            }
           }'.
-
+         'function doTT(obj)
+          { textarea = document.getElementById(obj);
+              // Code for IE
+              if (document.selection) 
+              { textarea.focus();
+                var sel = document.selection.createRange();
+                if (sel.text == "") sel.text = " ";
+                sel.text = "\'\'" + sel.text + "\'\'";
+              }
+              else 
+              {  // Code for Mozilla Firefox
+                var len = textarea.value.length;
+                var start = textarea.selectionStart;
+                var end = textarea.selectionEnd;
+                var scrollTop = textarea.scrollTop;
+                var scrollLeft = textarea.scrollLeft;
+                var sel = textarea.value.substring(start, end);
+                if (start == end) { sel = " "; }
+                var rep = "\'\'" + sel + "\'\'";
+                textarea.value =  textarea.value.substring(0,start) + rep + textarea.value.substring(end,len);
+                textarea.scrollTop = scrollTop;
+                textarea.scrollLeft = scrollLeft;
+              }
+          }'.
           'function doList(tag1,obj)
           {
               textarea = document.getElementById(obj);
-
-          		if (document.selection) 
-          			{ // Code for IE
-          				textarea.focus();
-          				var sel = document.selection.createRange();
-          				var list = sel.text.split("\n");
-          		
-          				for(i=0;i<list.length;i++) 
-          				{ list[i] = tag1 + list[i]; }
-          				sel.text = "\n" + list.join("\n") + "\n";
-          			} 
+              if (document.selection) 
+              { // Code for IE
+                textarea.focus();
+                var sel = document.selection.createRange();
+                var list = sel.text.split("\n");
+                for(i=0;i<list.length;i++) 
+                { list[i] = tag1 + list[i]; }
+                sel.text = "\n" + list.join("\n") + "\n";
+              } 
               else
-          			{ // Code for Firefox
-          		    var len = textarea.value.length;
-          	      var start = textarea.selectionStart;
-          		    var end = textarea.selectionEnd;
-          		    var i;
-
-          		    var scrollTop = textarea.scrollTop;
-          		    var scrollLeft = textarea.scrollLeft;
-
-                  var sel = textarea.value.substring(start, end);
-          		    var list = sel.split("\n");
-          		
-              		for(i=0;i<list.length;i++) 
-          				{ list[i] = tag1 + list[i]; }
-
-              		var rep = "\n" + list.join("\n") + "\n";
-              		textarea.value =  textarea.value.substring(0,start) + rep + textarea.value.substring(end,len);
-
-              		textarea.scrollTop = scrollTop;
-              		textarea.scrollLeft = scrollLeft;
+              { // Code for Firefox
+                var len = textarea.value.length;
+                var start = textarea.selectionStart;
+                var end = textarea.selectionEnd;
+                var i;
+                var scrollTop = textarea.scrollTop;
+                var scrollLeft = textarea.scrollLeft;
+                var sel = textarea.value.substring(start, end);
+                var list = sel.split("\n");
+                for(i=0;i<list.length;i++) 
+                { list[i] = tag1 + list[i]; }
+                var rep = "\n" + list.join("\n") + "\n";
+                textarea.value =  textarea.value.substring(0,start) + rep + textarea.value.substring(end,len);
+                textarea.scrollTop = scrollTop;
+                textarea.scrollLeft = scrollLeft;
               }
           }
          </script>';
