@@ -37,12 +37,11 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
      */
     function handle($match, $state, $pos, Doku_Handler $handler) {
         global $ID, $conf;
-        $match = substr($match,strlen('{{anss>'),-2); //strip markup from start and end
 
-        //handle params
-        $params = $match;  // if you will have more parameters and choose ',' to delim them
+        // if you will have more parameters and choose ',' to delim them
+        $params = substr($match,strlen('{{anss>'),-2); //strip markup from start and end
 
-        //Default Value
+        //Default Value    $ans_conf['params'] 以外は使用されていない？
         $ans_conf = array();
         $ans_conf['newsroot']     = 'news';
         $ans_conf['newspage']     = 'newsdata';
@@ -76,9 +75,8 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
         $prefix       = 'anss';
         $del          = 'anss_del';
         $cut_prefx    = 'news_input_';
-        $allnewsdata1 = $this->getConf('news_output');
-        $allnewsdata  = wl( (empty($allnewsdata1) ? 'news:newsdata' : $allnewsdata1) );
-        $news_root    = substr($allnewsdata, 0, strripos($allnewsdata, ":"));
+        $news_output  = $this->getConf('news_output');
+        $allnewsdata  = wl( (empty($news_output) ? 'news:newsdata' : $news_output) );
 
         // check if user has write permission on that ID
         $current_usr = pageinfo();
@@ -269,7 +267,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                                ' value="'.$default_value.'" title="'.trim($this->getLang(trim($fields[5]))).
                                '" /></p>'.NL;
                 } else if (trim($fields[1]) == "link") {
-                    $default_value = wl($allnewsdata1).$link_anker;
+                    $default_value = $allnewsdata.$link_anker;
                     $output .= '<p>'.trim($fields[4]).
                                '<input class="news_input_'.trim($fields[0]).
                                '" id="news_input_'.trim($fields[0]).
@@ -338,11 +336,11 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
             $newsitems = array();
             // this will be called to display a preview
             $output  = '<div class="news_box" '.$prefs[1].'>';
-            if ($this->getConf('newsflash_link') == false) {
-                $output .= '<div  class="news_header">'.$this->getLang('newsflash_title').'</div>'.NL;
+            if ($this->getConf('newsflash_link')) {
+                $output .= '<div class="news_header"><a class="news_header_link" href="'.
+                           $allnewsdata.'">'.$this->getLang('newsflash_title').'</a></div>'.NL;
             } else {
-                $output .= '<div  class="news_header"><a class="news_header_link" href="'.
-                           $allnewsdata .'">'.$this->getLang('newsflash_title').'</a></div>'.NL;
+                $output .= '<div class="news_header">'.$this->getLang('newsflash_title').'</div>'.NL;
             }
             $output .= '<div class="news_list" '.$item_width.'">'.NL;
 
@@ -965,16 +963,15 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
 
             if ($archive_options['class']=='toc') {
                 $output = '<script type="text/javascript">/*<![CDATA[*/
-                           function archive__toc_open(toggle_id, img_ID) 
-                              {   if (document.getElementById(toggle_id).style.display == "none")
-                                  {   document.getElementById(toggle_id).style.display = "block";
-                                      document.getElementById(img_ID).style.backgroundPosition = "0px 0px";
-                                  }
-                                  else
-                                  {   document.getElementById(toggle_id).style.display = "none";
-                                      document.getElementById(img_ID).style.backgroundPosition = "0px -5px";
-                                  }
-                              }
+                           function archive__toc_open(toggle_id, img_ID){
+                               if (document.getElementById(toggle_id).style.display == "none") {
+                                   document.getElementById(toggle_id).style.display = "block";
+                                   document.getElementById(img_ID).style.backgroundPosition = "0px 0px";
+                               } else {
+                                   document.getElementById(toggle_id).style.display = "none";
+                                   document.getElementById(img_ID).style.backgroundPosition = "0px -5px";
+                               }
+                           }
                            /*!]]>*/</script>'.
                           '<div class="archive_box" id="archive__toc"  style="'.$archive_options['style'].'">
                            <h3 class="toggle open" style="cursor: pointer;" onClick="archive__toc_open(\''.$blink_id.'\',\''.$img_ID.'\')">
@@ -987,7 +984,7 @@ class syntax_plugin_anewssystem extends DokuWiki_Syntax_Plugin {
                                  </div
                                  <hr />
                                  <div style="text-align:right;font-size:.85em; border-top: 1px dotted #828282;">
-                                    <a href="'.$news_root.':allnewsdata'.$this->getConf('act_delim').'do=shownewsarchive">&raquo; News Archive</a>
+                                    <a href="'.$allnewsdata.$this->getConf('act_delim').'do=shownewsarchive">&raquo; News Archive</a>
                                  </div>
                              </div>
                           </div>'.NL.NL;
